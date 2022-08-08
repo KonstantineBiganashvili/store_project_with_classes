@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import Product from '../Product';
-import Header from '../Header';
 import Axios from 'axios';
+
+import ProductList from '../ProductList';
+import Header from '../Header';
 
 export default class App extends Component {
   state = {
@@ -154,17 +155,6 @@ export default class App extends Component {
   };
   /* Increment/Decrement branch */
 
-  products = () =>
-    this.state.allProducts.map((element) => (
-      <Product
-        key={element.id}
-        id={element.id}
-        element={element}
-        setSelected={this.setSelected}
-        changeSelectedAmount={this.changeSelectedAmount}
-      />
-    ));
-
   render = () => {
     localStorage.setItem('Basket', JSON.stringify(this.state.basket));
 
@@ -177,7 +167,13 @@ export default class App extends Component {
           updateValue={this.updateValue}
         />
         {/* Header branch */}
-        <div id="products">{this.products()}</div>
+        <div id="products">
+          <ProductList
+            products={this.state.allProducts}
+            setSelected={this.setSelected}
+            changeSelectedAmount={this.changeSelectedAmount}
+          />
+        </div>
       </>
     );
   };

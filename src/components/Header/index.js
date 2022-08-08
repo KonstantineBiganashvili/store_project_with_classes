@@ -1,7 +1,7 @@
 import React from 'react';
 import './Header.css';
 
-export default function Header(props) {
+const Header = (props) => {
   const { updateValue, sum, value } = props;
 
   return (
@@ -20,4 +20,6 @@ export default function Header(props) {
       <p>Total sum of chosen products: ${sum} USD</p>
     </header>
   );
-}
+};
+
+export default Header;

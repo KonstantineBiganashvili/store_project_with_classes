@@ -1,7 +1,7 @@
 import React from 'react';
 import './Product.css';
 
-export default function Product(props) {
+const Product = (props) => {
   const { element, changeSelectedAmount } = props;
   const { id, src, name, price, stock, amount } = element;
   const { setSelected } = props;
@@ -44,4 +44,6 @@ export default function Product(props) {
       </div>
     </div>
   );
-}
+};
+
+export default Product;
