@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Product } from '../Product';
-import { Header } from '../Header';
+import Product from '../Product';
+import Header from '../Header';
 import Axios from 'axios';
 
 export default class App extends Component {
