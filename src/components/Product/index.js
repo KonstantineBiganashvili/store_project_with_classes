@@ -1,7 +1,40 @@
 import React, { Component } from 'react';
 import './Product.css';
 
+<<<<<<< Updated upstream
 let localBasket = localStorage.getItem('Basket');
+=======
+const Product = (props) => {
+  const { allProducts, setBasket, element, changeSelectedAmount } = props;
+  const { id, src, name, price, stock, amount } = element;
+<<<<<<< Updated upstream
+=======
+
+  const setSelected = (id) => {
+    allProducts.forEach((oldProduct) => {
+      if (oldProduct.id === id) {
+        if (!oldProduct.amount) {
+          oldProduct.amount = 1;
+        }
+
+        setBasket(id, oldProduct.amount);
+      }
+    });
+  };
+>>>>>>> Stashed changes
+
+  const setSelected = (id) => {
+    allProducts.forEach((oldProduct) => {
+      if (oldProduct.id === id) {
+        if (!oldProduct.amount) {
+          oldProduct.amount = 1;
+        }
+
+        setBasket(id, oldProduct.amount);
+      }
+    });
+  };
+>>>>>>> Stashed changes
 
 export class Product extends Component {
   render = () => {
