@@ -96,7 +96,10 @@ export default class App extends Component {
           if (!oldProduct.amount) {
             oldProduct.amount = 1;
           }
-          if (string === 'increment') {
+          if (
+            string === 'increment' &&
+            oldProduct.amount !== oldProduct.stock
+          ) {
             oldProduct.amount = oldProduct.amount + 1;
           } else if (string === 'decrement') {
             oldProduct.amount = oldProduct.amount - 1;
