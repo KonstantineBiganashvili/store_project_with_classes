@@ -2,7 +2,7 @@ import React from 'react';
 import './Header.css';
 
 const Header = (props) => {
-  const { updateValue, sum, value } = props;
+  const { updateValue, searchFunction, sum, value } = props;
 
   return (
     <header id="header">
@@ -14,7 +14,7 @@ const Header = (props) => {
         onInput={(e) => updateValue(e)}
         value={value}
       />
-      <button type="submit" id="searchBtn" /* onClick={searchFunction} */>
+      <button type="submit" id="searchBtn" onClick={searchFunction}>
         Search
       </button>
       <p>Total sum of chosen products: ${sum} USD</p>

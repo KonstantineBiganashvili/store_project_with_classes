@@ -6,21 +6,19 @@ import Header from '../Header';
 
 export default class App extends Component {
   state = {
-    sum: 0,
     inputText: '',
     basket: JSON.parse(localStorage.getItem('Basket')) || {},
     allProducts: [],
+    filteredProducts: [],
   };
 
-  componentDidMount = async () => {
-    await Axios.get('./data.json').then((res) => {
+  componentDidMount = () => {
+    Axios.get('./data.json').then((res) => {
       let newProducts = res.data;
       const localBasket = JSON.parse(localStorage.getItem('Basket'));
-      let newSum = 0;
 
       newProducts = newProducts.map((oldProduct) => {
         if (localBasket.hasOwnProperty(oldProduct.id)) {
-          newSum = newSum + localBasket[oldProduct.id] * oldProduct.price;
           oldProduct.amount = localBasket[oldProduct.id];
         }
 
@@ -28,49 +26,45 @@ export default class App extends Component {
       });
 
       this.setState({
-        sum: newSum,
         allProducts: newProducts,
       });
     });
   };
 
-  setSelected = (id) => {
-    const newProducts = this.state.allProducts.map((oldProduct) => {
-      if (oldProduct.id === id) {
-        if (!oldProduct.amount) {
-          oldProduct.amount = 1;
+  setBasket = (id, amount, string) => {
+    this.setState((oldState) => {
+      const { basket } = this.state;
+
+      if (
+        !basket.hasOwnProperty(id) ||
+        string === 'increment' ||
+        string === 'decrement'
+      ) {
+        if (amount === 0) {
+          return delete basket[id];
         }
-        if (!this.state.basket.hasOwnProperty(id)) {
-          this.setState({
-            basket: {
-              ...this.state.basket,
-              [id]: oldProduct.amount || 1,
-            },
-          });
 
-          this.setState({
-            sum: this.state.sum + oldProduct.price * oldProduct.amount,
-          });
-        } else if (this.state.basket.hasOwnProperty(id)) {
-          const currentBasket = this.state.basket;
-          delete currentBasket[id];
-
-          this.setState({
-            basket: currentBasket,
-          });
-
-          this.setState({
-            sum: this.state.sum - oldProduct.price * oldProduct.amount,
-          });
-        }
+        basket[id] = amount || 1;
+      } else if (basket.hasOwnProperty(id)) {
+        delete basket[id];
       }
 
-      return oldProduct;
+      return oldState;
     });
+  };
 
-    this.setState({
-      allProducts: newProducts,
-    });
+  setSum = () => {
+    const { allProducts, basket } = this.state;
+
+    const totalSum = allProducts.reduce((sum, element) => {
+      if (basket.hasOwnProperty(element.id)) {
+        return sum + element.price * element.amount;
+      }
+
+      return sum;
+    }, 0);
+
+    return totalSum;
   };
 
   /* Header branch */
@@ -81,76 +75,38 @@ export default class App extends Component {
     });
   };
 
+  searchFunction = () => {
+    const filteredProducts = this.state.allProducts.filter((product) => {
+      const productName = product.name.toLowerCase();
+      return productName.includes(this.state.inputText.toLowerCase());
+    });
+
+    this.setState({
+      filteredProducts: filteredProducts,
+    });
+  };
+
   /* Header branch */
 
   /* Increment/Decrement branch */
   changeSelectedAmount = (string, id) => {
     if (this.state.basket.hasOwnProperty(id)) {
-      if (string === 'increment') {
-        const newProducts = this.state.allProducts.map((oldProduct) => {
-          if (oldProduct.id === id) {
-            if (!oldProduct.amount) {
-              oldProduct.amount = 1;
-            }
-            if (oldProduct.amount !== oldProduct.stock) {
-              oldProduct.amount = oldProduct.amount + 1;
-            }
-
-            this.setState({
-              basket: {
-                ...this.state.basket,
-                [id]: oldProduct.amount,
-              },
-            });
-            this.setState({
-              sum: this.state.sum + oldProduct.price,
-            });
+      this.state.allProducts.map((oldProduct) => {
+        if (oldProduct.id === id) {
+          if (!oldProduct.amount) {
+            oldProduct.amount = 1;
           }
-          return oldProduct;
-        });
-
-        this.setSelected({
-          allProducts: newProducts,
-        });
-      } else if (string === 'decrement') {
-        const newProducts = this.state.allProducts.map((oldProduct) => {
-          if (oldProduct.id === id) {
-            if (!oldProduct.amount) {
-              oldProduct.amount = 1;
-            }
-            if (oldProduct.amount > 0) {
-              console.log(oldProduct.amount);
-              oldProduct.amount = oldProduct.amount - 1;
-            }
-            if (oldProduct.amount === 0) {
-              const currentBasket = this.state.basket;
-              delete currentBasket[id];
-
-              this.setState({
-                basket: currentBasket,
-              });
-            }
-
-            if (this.state.basket.hasOwnProperty(id) && oldProduct.amount > 0) {
-              this.setState({
-                basket: {
-                  ...this.state.basket,
-                  [id]: oldProduct.amount,
-                },
-              });
-            }
-
-            this.setState({
-              sum: this.state.sum - oldProduct.price,
-            });
+          if (string === 'increment') {
+            oldProduct.amount = oldProduct.amount + 1;
+          } else if (string === 'decrement') {
+            oldProduct.amount = oldProduct.amount - 1;
           }
-          return oldProduct;
-        });
 
-        this.setSelected({
-          allProducts: newProducts,
-        });
-      }
+          this.setBasket(id, oldProduct.amount, string);
+        }
+
+        return oldProduct;
+      });
     }
   };
   /* Increment/Decrement branch */
@@ -158,20 +114,27 @@ export default class App extends Component {
   render = () => {
     localStorage.setItem('Basket', JSON.stringify(this.state.basket));
 
+    const sum = this.setSum();
+
     return (
       <>
         {/* Header branch */}
         <Header
-          sum={this.state.sum}
+          sum={sum || 0}
           inputText={this.state.inputText}
           updateValue={this.updateValue}
+          searchFunction={this.searchFunction}
         />
         {/* Header branch */}
         <div id="products">
           <ProductList
-            products={this.state.allProducts}
-            setSelected={this.setSelected}
+            products={
+              this.state.filteredProducts.length
+                ? this.state.filteredProducts
+                : this.state.allProducts
+            }
             changeSelectedAmount={this.changeSelectedAmount}
+            setBasket={this.setBasket}
           />
         </div>
       </>

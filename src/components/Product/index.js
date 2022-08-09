@@ -2,11 +2,21 @@ import React from 'react';
 import './Product.css';
 
 const Product = (props) => {
-  const { element, changeSelectedAmount } = props;
+  const { allProducts, setBasket, element, changeSelectedAmount } = props;
   const { id, src, name, price, stock, amount } = element;
-  const { setSelected } = props;
 
   let localBasket = JSON.parse(localStorage.getItem('Basket')) || {};
+
+  const setSelected = (id) => {
+    allProducts.forEach((oldProduct) => {
+      if (oldProduct.id === id) {
+        if (!oldProduct.amount) {
+          oldProduct.amount = 1;
+        }
+        setBasket(id, oldProduct.amount);
+      }
+    });
+  };
 
   return (
     <div className="main-container">
