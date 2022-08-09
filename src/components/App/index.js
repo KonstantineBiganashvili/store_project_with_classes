@@ -91,7 +91,7 @@ export default class App extends Component {
   /* Increment/Decrement branch */
   changeSelectedAmount = (string, id) => {
     if (this.state.basket.hasOwnProperty(id)) {
-      const newProducts = this.state.allProducts.map((oldProduct) => {
+      this.state.allProducts.map((oldProduct) => {
         if (oldProduct.id === id) {
           if (!oldProduct.amount) {
             oldProduct.amount = 1;
@@ -106,10 +106,6 @@ export default class App extends Component {
         }
 
         return oldProduct;
-      });
-
-      this.setSelected({
-        allProducts: newProducts,
       });
     }
   };
@@ -137,7 +133,6 @@ export default class App extends Component {
                 ? this.state.filteredProducts
                 : this.state.allProducts
             }
-            setSelected={this.setSelected}
             changeSelectedAmount={this.changeSelectedAmount}
             setBasket={this.setBasket}
           />
